@@ -94,11 +94,14 @@ abstract class AnimatedCarouselWidget extends CarouselWidgetBase {
 
 					animTargetPosition = index * -measure - currentMargin
 					if (!animationFallback) {
-						setChildPanelPosition(animTargetPosition)
+						Scheduler::get().scheduleDeferred([ | 
+							setChildPanelPosition(animTargetPosition)
+						])
 					}
 
 					anim.run(transitionDuration)
 					runTimer.schedule(transitionDuration)
+
 				}
 			])
 	}

@@ -8,6 +8,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import org.vaadin.virkki.carousel.ComponentSelectListener;
@@ -21,9 +22,47 @@ import org.vaadin.virkki.carousel.client.widget.gwt.CarouselLoadMode;
 @SuppressWarnings("serial")
 public class MyVaadinUI extends UI {
 
-    private int n = 0, depth = 0;
+    private int n = 0, depth = 1;
     private HorizontalCarousel c = new HorizontalCarousel();
-    	
+    
+    protected void init(final VaadinRequest request) {
+        final HorizontalCarousel c = new HorizontalCarousel();
+        c.setSizeFull();
+        c.addComponent(buildPanel());
+        c.setTransitionDuration(2000);
+        c.setLoadMode(CarouselLoadMode.EAGER);
+        final Button b = new Button("push", new Button.ClickListener() {
+            @Override
+            public void buttonClick(final Button.ClickEvent event) {
+                final Panel p = buildPanel();
+                c.addComponent(p);
+                try {
+        			Thread.sleep(1000);
+        		} catch (InterruptedException e) {
+        		}
+                c.scroll(1);
+                c.requestWidgets(depth++);
+            }
+
+        });
+
+        final VerticalLayout vl = new VerticalLayout(c, b);
+        vl.setSizeFull();
+        setContent(vl);
+        vl.setExpandRatio(c, 1.0f);
+    }    
+
+    private Panel buildPanel() {
+		final Panel p = new Panel(depth+"n");
+        VerticalLayout layout = new VerticalLayout();
+        p.setContent(layout);
+        layout.setSizeFull();
+        p.setSizeFull();
+        layout.addComponent(new Button("" + new Date()));
+        layout.addComponent(new Label("Lorem ipsum Lorem ipsum"));
+		return p;
+	}
+    	/*
     @Override
     protected void init(VaadinRequest request) {
         setSizeFull();
@@ -36,7 +75,7 @@ public class MyVaadinUI extends UI {
         c.setMouseDragEnabled(false);
         c.setMouseWheelEnabled(false);
         c.setTouchDragEnabled(false);
-        c.setTransitionDuration(1000);
+        c.setTransitionDuration(2000);
         layout.addComponent(c);
         c.addComponentSelectListener(new ComponentSelectListener() {
             @Override
@@ -54,17 +93,12 @@ public class MyVaadinUI extends UI {
                 for (Component tobeRemoved : toRemove) {
                     c.removeComponent(tobeRemoved);
                 }
+//                component.setEnabled(true);
             }
         });
         c.addComponent(buildChild());
         c.setSizeFull();
         layout.setExpandRatio(c, 1.0f);
-        layout.addComponent(new Button("Push", new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                push(buildChild());
-            }
-        }));
         
         layout.addComponent(new Button("Pop", new Button.ClickListener() {
             @Override
@@ -93,24 +127,32 @@ public class MyVaadinUI extends UI {
         } else {
             c.addComponent(child);
         }
+        try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         c.requestWidgets(depth);
         c.scroll(1);
     }
     
     private Panel buildChild() {
         String str = "Num " + (++n);
-        Panel p = new Panel(str);
+        final Panel p = new Panel(str);
         VerticalLayout layout = new VerticalLayout();
         p.setContent(layout);
         layout.setSizeFull();
         p.setSizeFull();
-        layout.addComponent(new Button(str, new Button.ClickListener() {
+        layout.addComponent(new Button("Push", new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                System.out.println("TALÁLT " + n);
+                System.out.println("** PUSH");
+//                p.setEnabled(false);
+                push(buildChild());
             }
         }));
         layout.addComponent(new Label("Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum "));
         return p;
-    }
+    }*/
 }
